@@ -1,15 +1,26 @@
-<script>
+<script lang="ts">
+/* Imports */
+import { defineComponent } from 'vue';
+import type { Dish } from './types';
+
+/* Components */
 import NewDishForm from '../components/NewDishForm.vue';
 import DishCard from '../components/DishCard.vue';
 import SideMenu from '../components/SideMenu.vue';
 
-export default {
+type DishShape = {
+  filterText: string;
+  dishList: Dish[];
+  showNewForm: boolean;
+};
+
+export default defineComponent({
   components: {
     NewDishForm,
     DishCard,
     SideMenu,
   },
-  data: () => ({
+  data: (): DishShape => ({
     filterText: '',
     dishList: [
       {
@@ -31,8 +42,8 @@ export default {
     showNewForm: false,
   }),
   computed: {
-    filteredDishList() {
-      return this.dishList.filter((dish) => {
+    filteredDishList(): Dish[] {
+      return this.dishList.filter((dish: Dish) => {
         if (dish.name) {
           return dish.name.toLowerCase().includes(this.filterText.toLowerCase());
         } else {
@@ -40,31 +51,30 @@ export default {
         }
       });
     },
-    numberOfDishes() {
+    numberOfDishes(): number {
       return this.filteredDishList.length;
     },
   },
   methods: {
-    addDish(payload) {
+    addDish(payload: Dish): void {
       this.dishList.push(payload);
       this.hideForm();
     },
-    deleteDish(payload) {
-      this.dishList = this.dishList.filter((dish) => {
+    deleteDish(payload: Dish): void {
+      this.dishList = this.dishList.filter((dish: Dish) => {
         return dish.id !== payload.id;
       });
     },
-    hideForm() {
+    hideForm(): void {
       this.showNewForm = false;
     },
   },
   mounted() {
-    const route = this.$route;
-    if (route.query.new) {
+    if (this.$route.query.new) {
       this.showNewForm = true;
     }
   },
-};
+});
 </script>
 
 <template>
