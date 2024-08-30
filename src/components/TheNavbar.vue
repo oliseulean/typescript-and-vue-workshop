@@ -1,28 +1,30 @@
-<script>
-export default {
-  props: {
-    tagline: {
-      type: [String, Number],
-      default: 'The best place to find your favorite dish',
+<script setup lang="ts">
+/* Imports */
+import { ref } from 'vue';
+
+/* Props */
+const props = defineProps < {
+  tagline: string | number;
+  default: 'The best place to find your favorite dish';
+} > ();
+
+/* State */ 
+const state = ref({
+  navList: [
+    {
+      name: 'Home',
+      path: '/',
     },
-  },
-  data: () => ({
-    navList: [
-      {
-        name: 'Home',
-        path: '/',
-      },
-      {
-        name: 'Restaurants',
-        path: '/restaurants',
-      },
-      {
-        name: 'Dishes',
-        path: '/dishes',
-      },
-    ],
-  }),
-};
+    {
+      name: 'Restaurants',
+      path: '/restaurants',
+    },
+    {
+      name: 'Dishes',
+      path: '/dishes',
+    },
+  ],
+});
 </script>
 
 <template>
@@ -35,11 +37,11 @@ export default {
     <div class="navbar-menu">
       <div class="navbar-start">
         <div class="navbar-item">
-          <small>{{ tagline }}</small>
+          <small>{{ props.tagline }}</small>
         </div>
       </div>
       <div class="navbar-end">
-        <div v-for="navItem in navList" class="navbar-item" :key="`nav-${navItem.name}`">
+        <div v-for="navItem in state.navList" class="navbar-item" :key="`nav-${navItem.name}`">
           <RouterLink :to="navItem.path">{{ navItem.name }}</RouterLink>
         </div>
       </div>

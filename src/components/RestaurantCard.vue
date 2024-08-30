@@ -1,37 +1,35 @@
-<script lang="ts">
+<script setup lang="ts">
 /* Imports */
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
+import { computed } from 'vue';
 import type { Restaurant } from '../views/types';
 
-export default defineComponent({
-  props: {
-    restaurant: {
-      type: Object as PropType<Restaurant>,
-      required: true,
-    },
-  },
-  emits: ['delete-restaurant'],
-  computed: {
-    statusColor() {
-      switch (this.restaurant.status) {
-        case 'Want to Try':
-          return 'is-warning';
-        case 'Recommended':
-          return 'is-success';
-        case 'Do Not Recommend':
-          return 'is-danger';
-        default:
-          return '';
-      }
-    },
-  },
-  methods: {
-    deleteRestaurant() {
-      this.$emit('delete-restaurant', this.restaurant);
-    },
-  },
+type PropTypes = {
+  restaurant: Restaurant;
+};
+
+/* Props */
+const props = defineProps<PropTypes>();
+
+/* Emits */
+const emits = defineEmits<{
+  (event: 'delete-restaurant', restaurant: Restaurant): void;
+}>();
+
+/* Computed */
+const statusColor = computed(() => {
+  const statusColorMap = {
+    'Want to Try': 'is-warning',
+    Recommended: 'is-success',
+    'Do Not Recommend': 'is-danger',
+  };
+
+  return statusColorMap[props.restaurant.status] || '';
 });
+
+/* Methods */
+const deleteRestaurant = () => {
+  emits('delete-restaurant', props.restaurant);
+};
 </script>
 
 <template>

@@ -1,37 +1,35 @@
-<script lang="ts">
+<script setup lang="ts">
 /* Imports */
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
+import { computed } from 'vue';
 import type { Dish } from '../views/types';
 
-export default defineComponent({
-  props: {
-    dish: {
-      type: Object as PropType<Dish>,
-      required: true,
-    },
-  },
-  emits: ['delete-dish'],
-  computed: {
-    statusColor() {
-      switch (this.dish.status) {
-        case 'Want to Try':
-          return 'is-warning';
-        case 'Recommended':
-          return 'is-success';
-        case 'Do Not Recommend':
-          return 'is-danger';
-        default:
-          return '';
-      }
-    },
-  },
-  methods: {
-    deleteDish() {
-      this.$emit('delete-dish', this.dish);
-    },
-  },
+type PropTypes = {
+  dish: Dish;
+};
+
+/* Props */
+const props = defineProps<PropTypes>();
+
+/* Emits */
+const emits = defineEmits<{
+  (event: 'delete-dish', dish: Dish): void;
+}>();
+
+/* Computed */
+const statusColor = computed(() => {
+  const statusColorMap = {
+    'Want to Try': 'is-warning',
+    Recommended: 'is-success',
+    'Do Not Recommend': 'is-danger',
+  };
+
+  return statusColorMap[props.dish.status] || '';
 });
+
+/* Methods */
+const deleteDish = () => {
+  emits('delete-dish', props.dish);
+};
 </script>
 
 <template>
@@ -42,10 +40,10 @@ export default defineComponent({
       </aside>
       <div class="media-content">
         <p class="title is-4 is-spaced mb-1">
-          {{ dish.name }}
+          {{ props.dish.name }}
         </p>
         <p class="subtitle mb-2">
-          <span class="tag" :class="statusColor">{{ dish.status }}</span>
+          <span class="tag" :class="statusColor">{{ props.dish.status }}</span>
         </p>
         <div>
           <button @click="deleteDish" class="button is-small is-danger is-light">Delete</button>
