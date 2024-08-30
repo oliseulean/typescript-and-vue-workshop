@@ -1,6 +1,7 @@
 <script lang="ts">
 /* Imports */
-import { defineComponent } from 'vue';
+import { defineComponent, computed, ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import type { Dish } from './types';
 
 /* Components */
@@ -8,21 +9,15 @@ import NewDishForm from '../components/NewDishForm.vue';
 import DishCard from '../components/DishCard.vue';
 import SideMenu from '../components/SideMenu.vue';
 
-type DishShape = {
-  filterText: string;
-  dishList: Dish[];
-  showNewForm: boolean;
-};
-
 export default defineComponent({
   components: {
     NewDishForm,
     DishCard,
     SideMenu,
   },
-  data: (): DishShape => ({
-    filterText: '',
-    dishList: [
+  setup() {
+    const filterText = ref('');
+    const dishList = ref<Dish[]>([
       {
         id: '7d9f3f17-964a-4e82-98e5-ecbba4d709a1',
         name: 'Ghost Pepper Poppers',
@@ -38,41 +33,54 @@ export default defineComponent({
         name: 'Full Laptop Battery',
         status: 'Do Not Recommend',
       },
-    ],
-    showNewForm: false,
-  }),
-  computed: {
-    filteredDishList(): Dish[] {
-      return this.dishList.filter((dish: Dish) => {
+    ]);
+    const showNewForm = ref(false);
+
+    const filteredDishList = computed((): Dish[] => {
+      return dishList.value.filter((dish: Dish) => {
         if (dish.name) {
-          return dish.name.toLowerCase().includes(this.filterText.toLowerCase());
+          return dish.name.toLowerCase().includes(filterText.value.toLowerCase());
         } else {
-          return this.dishList;
+          return dishList.value;
         }
       });
-    },
-    numberOfDishes(): number {
-      return this.filteredDishList.length;
-    },
-  },
-  methods: {
-    addDish(payload: Dish): void {
-      this.dishList.push(payload);
-      this.hideForm();
-    },
-    deleteDish(payload: Dish): void {
-      this.dishList = this.dishList.filter((dish: Dish) => {
+    });
+
+    const numberOfDishes = computed((): number => {
+      return filteredDishList.value.length;
+    });
+
+    const addDish = (payload: Dish): void => {
+      dishList.value.push(payload);
+      hideForm();
+    };
+
+    const deleteDish = (payload: Dish): void => {
+      dishList.value = dishList.value.filter((dish: Dish) => {
         return dish.id !== payload.id;
       });
-    },
-    hideForm(): void {
-      this.showNewForm = false;
-    },
-  },
-  mounted() {
-    if (this.$route.query.new) {
-      this.showNewForm = true;
-    }
+    };
+
+    const hideForm = (): void => {
+      showNewForm.value = false;
+    };
+
+    onMounted(() => {
+      const route = useRoute();
+      if (route.query.new) {
+        showNewForm.value = true;
+      }
+    });
+
+    return {
+      filterText,
+      dishList,
+      showNewForm,
+      filteredDishList,
+      numberOfDishes,
+      addDish,
+      deleteDish,
+    };
   },
 });
 </script>
